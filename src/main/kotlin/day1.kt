@@ -1,3 +1,5 @@
+package day1
+
 import shared.getLines
 
 fun main() {

@@ -4,8 +4,14 @@ import kotlin.test.assertEquals
 class Day2 {
     @Test
     fun `should produce 150`(){
-        val result = moveProduces(input)
+        val result = movePart1(input)
         assertEquals(150, result)
+    }
+
+    @Test
+    fun `part two should produce 900`(){
+        val result = movePart2(input)
+        assertEquals(900, result)
     }
 
     companion object {

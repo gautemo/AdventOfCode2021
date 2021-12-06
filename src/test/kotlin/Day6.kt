@@ -11,10 +11,10 @@ class Day6 {
     @Test
     fun `should have 26984457539 lanternfish after 256 days`(){
         val result = simulateLanternfishGrowth(input, 256)
-        assertEquals(26, result)
+        assertEquals(26984457539, result)
     }
 
     companion object{
-        val input = "3,4,3,1,2"
+        const val input = "3,4,3,1,2"
     }
 }

@@ -6,4 +6,4 @@ fun getLines(filename: String) = File(Thread.currentThread().contextClassLoader.
 
 fun getLinesAsInt(filename: String) = getLines(filename).map { it.toInt() }
 
-fun getText(filename: String) = File(Thread.currentThread().contextClassLoader.getResource(filename)!!.toURI()).readText()
+fun getText(filename: String) = File(Thread.currentThread().contextClassLoader.getResource(filename)!!.toURI()).readText().trim()

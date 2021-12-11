@@ -1,12 +1,14 @@
+import shared.Point
+import shared.XYMap
 import shared.getLines
 
 fun findRiskLevelsSum(input: List<String>): Int{
-    val map = XYMap(input)
-    return map.getLowPoints().sumOf { map.getValue(it)!! + 1 }
+    val map = LavaTubes(input)
+    return map.getLowPoints().sumOf { map.getValue(it) + 1 }
 }
 
 fun findLargestBasinsMultiplied(input: List<String>): Int{
-    val map = XYMap(input)
+    val map = LavaTubes(input)
     val basinSizes = map.findBasins()
     return basinSizes.sortedDescending().take(3).reduce { acc, i -> acc * i }
 }
@@ -19,44 +21,11 @@ fun main(){
     println(task2)
 }
 
-private class XYMap(input: List<String>) {
-    private val width = input.first().length
-    private val height = input.size
-    private val xyMap = mutableMapOf<Point, Int>()
+private class LavaTubes(input: List<String>): XYMap<Int>(input, { c: Char -> c.digitToInt() }) {
 
-    init {
-        for((y, row) in input.withIndex()) {
-            for ((x, char) in row.withIndex()) {
-                xyMap[Point(x, y)] = char.digitToInt()
-            }
-        }
-    }
+    private fun lowPoint(point: Point) = findAdjacentPoints(point).all { getValue(point) < getValue(it) }
 
-    fun getValue(point: Point) = xyMap[point]
-
-    private fun findAdjacentPoints(point: Point): List<Point>{
-        val list = mutableListOf<Point>()
-        val x = point.x
-        val y = point.y
-        if(xyMap[Point(x-1, y)] != null) list.add(Point(x-1, y))
-        if(xyMap[Point(x, y-1)] != null) list.add(Point(x, y-1))
-        if(xyMap[Point(x, y+1)] != null) list.add(Point(x, y+1))
-        if(xyMap[Point(x+1, y)] != null) list.add(Point(x+1, y))
-        return list
-    }
-
-    private fun lowPoint(point: Point) = findAdjacentPoints(point).all { xyMap[point]!! < xyMap[it]!! }
-
-    fun getLowPoints(): List<Point>{
-        val list = mutableListOf<Point>()
-        for(y in 0 until height){
-            for(x in 0 until width){
-                val p = Point(x,y)
-                if(lowPoint(p)) list.add(p)
-            }
-        }
-        return list
-    }
+    fun getLowPoints() = allPoints().filter { lowPoint(it) }
 
     fun findBasins() = getLowPoints().map { findBasinSize(it) }
 
@@ -72,5 +41,3 @@ private class XYMap(input: List<String>) {
         return size
     }
 }
-
-private data class Point(val x: Int, val y: Int)

@@ -1,8 +1,8 @@
 package shared
 
 open class XYMap<T>(input: List<String>, toType: (char: Char) -> T) {
-    private val width = input.first().length
-    private val height = input.size
+    val width = input.first().length
+    val height = input.size
     private val xyMap = mutableMapOf<Point, T>()
 
     init {

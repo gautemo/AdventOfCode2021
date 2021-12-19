@@ -8,6 +8,12 @@ class Day18 {
         assertEquals(4140, result)
     }
 
+    @Test
+    fun `largest magnitude of two snail pairs is 3993`(){
+        val result = largestMagnitudeSnailHomeWork(input)
+        assertEquals(3993, result)
+    }
+
     companion object{
         val input = """
             [[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]

@@ -1,3 +1,4 @@
+import shared.getLines
 import kotlin.math.ceil
 
 fun snailHomework(assignment: List<String>): Int{
@@ -7,13 +8,12 @@ fun snailHomework(assignment: List<String>): Int{
         do {
             val exploded = explode(total)
             var reduced = false
-            if(exploded != null){
+            if(!exploded){
                 reduced = reduce(total)
             }
-        }while (exploded != null || reduced)
-
+        }while (exploded || reduced)
     }
-    return 0
+    return toMagnitude(total as SnailPair)
 }
 
 sealed class SnailElement{}
@@ -37,39 +37,29 @@ private fun String.rootComma(): Int{
     throw Exception("should have root ,")
 }
 
-fun explode(snailPair: SnailPair, nested: Int = 0): Explosion? {
+fun explode(snailPair: SnailPair, rootPair: SnailPair = snailPair, nested: Int = 0): Boolean {
     if(nested == 4){
-        return Explosion((snailPair.left as SnailValue).value, (snailPair.right as SnailValue).value)
+        val list = snailValueLine(rootPair)
+        val explodeIndex = list.indexOf(snailPair.left)
+        if(explodeIndex-1 >= 0) list[explodeIndex-1].value += (snailPair.left as SnailValue).value
+        if(explodeIndex+2 < list.size) list[explodeIndex+2].value += (snailPair.right as SnailValue).value
+        return true
     }
     if(snailPair.left is SnailPair){
-        val exploded = explode(snailPair.left as SnailPair, nested + 1)
-        if(exploded != null) {
-            if(!exploded.updatedPair){
-                snailPair.left = SnailValue(0)
-                exploded.updatedPair = true
-            }
-            if(snailPair.right is SnailValue) {
-                    (snailPair.right as SnailValue).value += exploded.updateRight
-                exploded.updateRight = 0
-            }
+        val exploded = explode(snailPair.left as SnailPair, rootPair, nested + 1)
+        if(exploded) {
+            if(nested == 3) snailPair.left = SnailValue(0)
             return exploded
         }
     }
     if(snailPair.right is SnailPair){
-        val exploded = explode(snailPair.right as SnailPair, nested + 1)
-        if(exploded != null) {
-            if(!exploded.updatedPair){
-                snailPair.right = SnailValue(0)
-                exploded.updatedPair = true
-            }
-            if(snailPair.left is SnailValue) {
-                (snailPair.left as SnailValue).value += exploded.updateLeft
-                exploded.updateLeft = 0
-            }
+        val exploded = explode(snailPair.right as SnailPair, rootPair,  nested + 1)
+        if(exploded) {
+            if(nested == 3) snailPair.right = SnailValue(0)
             return exploded
         }
     }
-    return null
+    return false
 }
 
 fun reduce(snailPair: SnailPair): Boolean{
@@ -78,22 +68,54 @@ fun reduce(snailPair: SnailPair): Boolean{
         snailPair.left = SnailPair(SnailValue(value / 2), SnailValue(ceil(value.toDouble() / 2).toInt()))
         return true
     }
+    if(snailPair.left is SnailPair && reduce(snailPair.left as SnailPair)) return true
     if(snailPair.right is SnailValue && (snailPair.right as SnailValue).value >= 10){
         val value = (snailPair.right as SnailValue).value
         snailPair.right = SnailPair(SnailValue(value / 2), SnailValue(ceil(value.toDouble() / 2).toInt()))
         return true
     }
-    if(snailPair.left is SnailPair) return reduce(snailPair.left as SnailPair)
-    if(snailPair.right is SnailPair) return reduce(snailPair.right as SnailPair)
+    if(snailPair.right is SnailPair && reduce(snailPair.right as SnailPair)) return true
     return false
 }
 
-data class Explosion(var updateLeft: Int, var updateRight: Int, var updatedPair: Boolean = false)
+private fun snailValueLine(snailPair: SnailPair): List<SnailValue>{
+    val list = mutableListOf<SnailValue>()
+    if(snailPair.left is SnailValue){
+        list.add(snailPair.left as SnailValue)
+    }else{
+        list.addAll(snailValueLine(snailPair.left as SnailPair))
+    }
+    if(snailPair.right is SnailValue){
+        list.add(snailPair.right as SnailValue)
+    }else{
+        list.addAll(snailValueLine(snailPair.right as SnailPair))
+    }
+    return list
+}
+
+private fun toMagnitude(snailPair: SnailPair): Int{
+    val left = if(snailPair.left is SnailValue) (snailPair.left as SnailValue).value else toMagnitude(snailPair.left as SnailPair)
+    val right = if(snailPair.right is SnailValue) (snailPair.right as SnailValue).value else toMagnitude(snailPair.right as SnailPair)
+    return 3*left + 2*right
+}
+
+fun largestMagnitudeSnailHomeWork(assignment: List<String>): Int{
+    var max = 0
+    for(line1 in assignment){
+        for(line2 in assignment){
+            if(line1 != line2){
+                val magnitude = snailHomework(listOf(line1, line2))
+                if(magnitude > max) max = magnitude
+            }
+        }
+    }
+    return max
+}
 
 fun main(){
-    val input = """
-        [[[[4,3],4],4],[7,[[8,4],9]]]
-        [1,1]
-    """.trimIndent().lines()
-    snailHomework(input)
+    val input = getLines("day18.txt")
+    val task1 = snailHomework(input)
+    println(task1)
+    val task2 = largestMagnitudeSnailHomeWork(input)
+    println(task2)
 }

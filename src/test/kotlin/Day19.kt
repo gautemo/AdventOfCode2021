@@ -3,9 +3,33 @@ import kotlin.test.assertEquals
 
 class Day19 {
     @Test
+    fun `finds 3 from small example`(){
+        val miniInput = """
+            --- scanner 0 ---
+            0,2,0
+            4,1,0
+            3,3,0
+
+            --- scanner 1 ---
+            -1,-1,0
+            -5,0,0
+            -2,1,0
+        """.trimIndent()
+        val result = findBeacons(miniInput, 3)
+        assertEquals(3, result)
+    }
+
+    @Test
     fun `finds 79 beacons`(){
         val result = findBeacons(input)
         assertEquals(79, result)
+    }
+
+    @Test
+    fun `largest dist between scanners are 3621`(){
+        findBeacons(input)
+        val result = largestDistBetweenScanners()
+        assertEquals(3621, result)
     }
 
     companion object{

@@ -2,25 +2,26 @@ import shared.getText
 
 var outsideLit = false
 
-fun processImage(input: String): Int{
+fun processImage(input: String, times: Int = 2): Int{
     val (algorithm, image) = input.split("\n\n")
     var enhanced = image
-    repeat(2){
+    repeat(times){
         enhanced = processImg(algorithm, enhanced)
-        if(!outsideLit && algorithm[0] == '#') outsideLit = true
-        if(outsideLit && algorithm.last() == '.') outsideLit = false
-        println(enhanced)
-        println()
+        if(outsideLit){
+            if(algorithm.last() == '.') outsideLit = false
+        }else{
+            if(algorithm[0] == '#') outsideLit = true
+        }
     }
     return enhanced.count { it == '#' }
 }
 
 private fun processImg(algorithm: String, image: String): String{
-    var newImg = ""
-    val yLength = image.lines().size+1
-    val xLength = image.lines().first().length+1
-    for(y in -2..yLength){
-        for(x in -2..xLength){
+    val newImg = StringBuilder()
+    val yLength = image.lines().size
+    val xLength = image.lines().first().length
+    for(y in -1..yLength){
+        for(x in -1..xLength){
             val algoIndex = listOf(
                 image.getPixel(x-1,y-1),
                 image.getPixel(x,y-1),
@@ -32,24 +33,19 @@ private fun processImg(algorithm: String, image: String): String{
                 image.getPixel(x,y+1),
                 image.getPixel(x+1,y+1),
             ).map { if(it == '#') '1' else '0' }.joinToString("").toInt(2)
-            newImg += algorithm[algoIndex]
+            newImg.append(algorithm[algoIndex])
         }
-        if(y != yLength) newImg += "\n"
+        if(y != yLength) newImg.append("\n")
     }
-    return newImg
+    return newImg.toString()
 }
 
-fun String.getPixel(x: Int, y: Int): Char{
-    if(x < 0 ||
-        y < 0 ||
-        x > this.lines().first().length - 1 ||
-        y > this.lines().size - 1
-    ) return if(outsideLit) '#' else '.'
-    return this.lines()[y][x]
-}
+fun String.getPixel(x: Int, y: Int) = this.lines().getOrNull(y)?.getOrNull(x) ?: if(outsideLit) '#' else '.'
 
 fun main(){
     val input = getText("day20.txt")
     val task1 = processImage(input)
     println(task1)
+    val task2 = processImage(input, 50) // slow
+    println(task2)
 }

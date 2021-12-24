@@ -1,3 +1,4 @@
+import shared.Point3D
 import shared.getText
 import kotlin.math.abs
 
@@ -48,8 +49,6 @@ private fun hasDistPoint(reference1: Point3D, rest1: List<Point3D>, reference2: 
         xDist == checkXDist && yDist == checkYDist && zDist == checkZDist
     }
 }
-
-data class Point3D(val x: Int, val y: Int, val z: Int)
 
 class Scanner(input: List<String>){
     val id = Regex("""\d+""").find(input.first())!!.value.toInt()
